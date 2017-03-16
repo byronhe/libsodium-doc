@@ -1,6 +1,6 @@
-# 公钥密码学 认证加密 Public-key authenticated encryption
+# 公钥密码学 认证加密 
 
-## Example
+## 例子
 
 ```c
 #define MESSAGE (const unsigned char *) "test"
@@ -30,25 +30,24 @@ if (crypto_box_open_easy(decrypted, ciphertext, CIPHERTEXT_LEN, nonce,
 }
 ```
 
-## Purpose
+## 目的
 
-Using public-key authenticated encryption, Bob can encrypt a confidential message specifically for Alice, using Alice's public key.
+使用公钥密码学认证加密，Bob 可以加密一个保密消息，使用 Alice 的公钥，专门发给 Alice。
+使用 Bob 的公钥，Alice 可以在解密消息之前，验证 消息密文是否 真的由 Bob 创建且没有被别人篡改过。
+Alice 只需要 Bob 的公钥，nonce 和 消息的密文。 Bob 不需要把自己的密钥公开给别人，甚至不需要公开给 Alice。
 
-Using Bob's public key, Alice can verify that the encrypted message was actually created by Bob and was not tampered with, before eventually decrypting it.
 
-Alice only needs Bob's public key, the nonce and the ciphertext. Bob should never ever share his secret key, even with Alice.
+并且，为了发送消息给 Alice ，Bob 只需要 Alice 的公钥，Alice 完全不需要公开自己的密钥，甚至不需要公开给 Bob。
 
-And in order to send messages to Alice, Bob only needs Alice's public key. Alice should never ever share her secret key either, even with Bob.
+Alice 可以使用同样的系统回复给 Bob，不需要再生成不同的 密钥对。
 
-Alice can reply to Bob using the same system, without having to generate a distinct key pair.
+nonce 不需要保密，但是一个nonce，在一对公私钥下，只能使用在 `crypto_box_open_easy()` 的一次调用中，绝对不能复用。
+一种生成 nonce 的简单方式是使用  `randombytes_buf()`, 考虑到 nonce 的大小， 随机数发生碰撞的概率是可以忽略的。对某些应用程序， 如果你希望使用 nonce 来探测丢失的消息，或者忽略被中间人重放的消息，简单地使用一个递增的计数器来作为 nonce 也是 ok 的。
 
-The nonce doesn't have to be confidential, but it should be used with just one invocation of `crypto_box_open_easy()` for a particular pair of public and secret keys.
+当做计算的时候，你必须确保同样的 nonce 值绝对不会被 复用 \(例如你可能有多个 线程 或者 多个机器在用同一组 密钥同时加密消息\）。
 
-One easy way to generate a nonce is to use `randombytes_buf()`, considering the size of nonces the risk of any random collisions is negligible. For some applications, if you wish to use nonces to detect missing messages or to ignore replayed messages, it is also ok to use a simple incrementing counter as a nonce.
+这套系统提供了相互认证。然而 ，一种典型的使用场景是加密 一个 server 和 多个client 间的通信，server 的公钥是预先公开的，而 client 匿名地连上来，即没有预先公开的公钥。
 
-When doing so you must ensure that the same value can never be re-used \(for example you may have multiple threads or even hosts generating messages using the same key pairs\).
-
-This system provides mutual authentication. However, a typical use case is to secure communications between a server, whose public key is known in advance, and clients connecting anonymously.
 
 ## Key pair generation
 
