@@ -1,4 +1,4 @@
-# 对称密码学 认证加密
+# 对称密码学 认证加密 AEAD
 
 ## 例子
 
@@ -32,9 +32,10 @@ if (crypto_secretbox_open_easy(decrypted, ciphertext, CIPHERTEXT_LEN, nonce, key
 nonce不需要保密，但是绝对不能在同一个key下重复使用。生成一个 nonce 的最简单办法是使用 `randombytes_buf()`。
 
 
-## Combined mode
+## Combined 模式
 
-In combined mode, the authentication tag and the encrypted message are stored together. This is usually what you want.
+
+在 combined 模式, 认证  和 消息密文 存储在一起。 一般需求都是这样的。
 
 ```c
 int crypto_secretbox_easy(unsigned char *c, const unsigned char *m,
@@ -42,15 +43,16 @@ int crypto_secretbox_easy(unsigned char *c, const unsigned char *m,
                           const unsigned char *k);
 ```
 
-The `crypto_secretbox_easy()` function encrypts a message `m` whose length is `mlen` bytes, with a key `k` and a nonce `n`.
+ `crypto_secretbox_easy()`  函数加密一个消息  `mlen` 字节长的消息`m` , 使用 key  `k` 和 nonce `n`。
+ 
+`k` 应该是 `crypto_secretbox_KEYBYTES` 字节长，并且 `n`应该是 `crypto_secretbox_NONCEBYTES` 字节长.
 
-`k` should be `crypto_secretbox_KEYBYTES` bytes and `n` should be `crypto_secretbox_NONCEBYTES` bytes.
+`c` 应该最少是 `crypto_secretbox_MACBYTES + mlen` 字节长.
 
-`c` should be at least `crypto_secretbox_MACBYTES + mlen` bytes long.
+消息密文的长度也是 `mlen` 字节， 这个函数把 `crypto_secretbox_MACBYTES`  字节长的 认证tag ， 在 `c` 中追加在 消息密文 后面 。
 
-This function writes the authentication tag, whose length is `crypto_secretbox_MACBYTES` bytes, in `c`, immediately followed by the encrypted message, whose length is the same as the plaintext: `mlen`.
+`c` 和 `m` 内存区间可以重叠, 因此可以做 ‘原地加密’ 。当然不要忘记 要有额外的 `crypto_secretbox_MACBYTES` 字节用于追加写 认证 tag。
 
-`c` and `m` can overlap, making in-place encryption possible. However do not forget that `crypto_secretbox_MACBYTES` extra bytes are required to prepend the tag.
 
 ```c
 int crypto_secretbox_open_easy(unsigned char *m, const unsigned char *c,
@@ -58,23 +60,25 @@ int crypto_secretbox_open_easy(unsigned char *m, const unsigned char *c,
                                const unsigned char *k);
 ```
 
-The `crypto_secretbox_open_easy()` function verifies and decrypts a ciphertext produced by `crypto_secretbox_easy()`.
+`crypto_secretbox_open_easy()` 函数 验证 并 解密  `crypto_secretbox_easy()` 生成的密文。
 
-`c` is a pointer to an authentication tag + encrypted message combination, as produced by `crypto_secretbox_easy()`.
-`clen` is the length of this authentication tag + encrypted message combination. Put differently, `clen` is the number of bytes written by `crypto_secretbox_easy()`, which is `crypto_secretbox_MACBYTES` + the length of the message.
+`c` 是个指针，指向 `crypto_secretbox_easy()` 生成的 消息密文 + 认证tag 的组合buffer。`clen` 是 这个组合的buffer的长度，换句话说，就是  `crypto_secretbox_MACBYTES` + 明文消息的长度。
 
-The nonce `n` and the key `k` have to match the used to encrypt and authenticate the message.
 
-The function returns `-1` if the verification fails, and `0` on success.
-On success, the decrypted message is stored into `m`.
+ nonce `n` 和 key `k` 必须和 加密/认证时候用的  nonce 和  相同。
+ 
+这个函数返回 `-1`， 表示验证失败。
+返回 `0` ，表示成功，并且解密出来的 消息 存入 `m` 中。
 
-`m` and `c` can overlap, making in-place decryption possible.
+`m` 和 `c` 内存区间可以重叠，因此可以做原地解密。
 
-## Detached mode
 
-Some applications may need to store the authentication tag and the encrypted message at different locations.
+## Detached 模式
 
-For this specific use case, "detached" variants of the functions above are available.
+
+一些程序可能需要 把 认证 tag  和 消息密文分开存储。
+
+对这种使用场景， 可以使用"detached" 系列变种函数。
 
 ```c
 int crypto_secretbox_detached(unsigned char *c, unsigned char *mac,
@@ -83,11 +87,9 @@ int crypto_secretbox_detached(unsigned char *c, unsigned char *mac,
                               const unsigned char *n,
                               const unsigned char *k);
 ```
-
-This function encrypts a message `m` of length `mlen` with a key `k` and a nonce `n`, and puts the encrypted message into `c`.
-Exactly `mlen` bytes will be put into `c`, since this function does not prepend the authentication tag.
-The tag, whose size is `crypto_secretbox_MACBYTES` bytes, will be put into `mac`.
-
+这个函数加密 `mlen` 长度的消息 `m`，使用 key `k` 和 nonce `n`，并且把消息密文 存入 `c`，由于这个函数不会在前面写入 认证tag， 会 精确地写入 `mlen` 字节到 `c`。
+ `crypto_secretbox_MACBYTES` 字节的认证tag，会写入 `mac`。
+ 
 ```c
 int crypto_secretbox_open_detached(unsigned char *m,
                                    const unsigned char *c,
@@ -97,27 +99,29 @@ int crypto_secretbox_open_detached(unsigned char *m,
                                    const unsigned char *k);
 ```
 
-The `crypto_secretbox_open_detached()` function verifies and decrypts an encrypted message `c` whose length is `clen`. `clen` doesn't include the tag, so this length is the same as the plaintext.
+ `crypto_secretbox_open_detached()` 函数验证并解密 长度是 `clen` 的消息密文 `c`，`clen` 不包括 认证tag，所以长度和明文相等。
+ 
+在使用 key `k` 和 nonce `n` 验证确认 `mac` 是这个密文的合法认证tag后， 明文会写入`m`。
 
-The plaintext is put into `m` after verifying that `mac` is a valid authentication tag for this ciphertext, with the given nonce `n` and key `k`.
+这个函数 返回 `-1` 如果验证失败, 返回 `0` 表示成功。
 
-The function returns `-1` if the verification fails, or `0` on success.
 
-## Constants
+## 常量
 
 - `crypto_secretbox_KEYBYTES`
 - `crypto_secretbox_MACBYTES`
 - `crypto_secretbox_NONCEBYTES`
 
-## Algorithm details
+## 算法细节
 
-- Encryption: XSalsa20 stream cipher
-- Authentication: Poly1305 MAC
+- 加密 Encryption: XSalsa20 stream cipher
+- 认证 Authentication: Poly1305 MAC
 
-## Notes
+## 注意
 
-The original NaCl `crypto_secretbox` API is also supported, albeit not recommended.
-
+ NaCl 原来的 `crypto_secretbox` API 也支持， 尽管不推荐。
+ 
+ 
 `crypto_secretbox()` takes a pointer to 32 bytes before the message, and stores the ciphertext 16 bytes after the destination pointer, the first 16 bytes being overwritten with zeros. `crypto_secretbox_open()` takes a pointer to 16 bytes before the ciphertext and stores the message 32 bytes after the destination pointer, overwriting the first 32 bytes with zeros.
 
 The `_easy` and `_detached` APIs are faster and improve usability by not requiring padding, copying or tricky pointer arithmetic.
