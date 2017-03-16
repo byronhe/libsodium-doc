@@ -1,33 +1,36 @@
-# Authenticated Encryption with Additional Data
+# AEAD 认证加密 (Authenticated Encryption with Additional Data)
 
-This operation:
-- Encrypts a message with a key and a nonce to keep it confidential
-- Computes an authentication tag. This tag is used to make sure that the message, as well as optional, non-confidential (non-encrypted) data, haven't been tampered with.
+本操作:
+- 用一个 key 和 nonce 加密一个消息，来保密。
+- 计算一个 认证tag。这个tag 用来确保这个消息的密文，和一段可选的不保密不加密的附加数据(Additional Data)， 没有被篡改过。
 
-A typical use case for additional data is to store protocol-specific metadata about the message, such as its length and encoding.
+一段  additional data 的典型场景，是存储协议特定的，关于消息的元数据，例如消息的长度和编码。
 
-## Supported constructions
+## 支持的构造
 
-Libsodium supports two popular constructions: AES256-GCM and ChaCha20-Poly1305.
+Libsodium 支持两种流行的构造：AES256-GCM 和 ChaCha20-Poly1305.
 
 ### AES256-GCM
 
-The current implementation of this construction is hardware-accelerated and requires the Intel SSSE3 extensions, as well as the `aesni` and `pclmul` instructions.
+当前的 AES256-GCM 实现是硬件加速的，并且要求 Intel  SSE3 扩展指令集，和 `aesni` 和 `pclmul` 系列指令。
 
-Intel Westmere processors (introduced in 2010) and newer meet the requirements.
+Intel Westmere 处理器 ( 2010 出现)  和更新的处理器满足这些要求。
 
-There are no plans to support non hardware-accelerated implementations of AES-GCM.
+不计划支持 非硬件加速的 AES-GCM 实现。
 
-If portability is not a concern, AES256-GCM is the fastest option.
+如果不用考虑可移植性，, AES256-GCM 是最快的。
+
 
 ### ChaCha20-Poly1305
 
-While AES is very fast on dedicated hardware, its performance on platforms that lack such hardware is considerably lower. Another problem is that many software AES implementations are vulnerable to cache-collision timing attacks.
+尽管 AES 在专用硬件上非常快，但是它在没有硬件加速的平台上，性能一般认为不高。另一个问题是很多 AES 的纯软件实现有 cache-collision timing 攻击漏洞，缓存冲突时间侧通道漏洞。
 
-ChaCha20 is considerably faster than AES in software-only implementations, making it around three times as fast on platforms that lack specialized AES hardware. ChaCha20 is also not sensitive to timing attacks.
+就纯软件实现来说， 一般认为 ChaCha20 的 性能比 AES 好, 在缺乏 AES 硬件的平台上，ChaCha20 大概是 AES 的 三倍 性能。 并且 ChaCha20 免疫  时间侧信道攻击。
 
-Poly1305 is a high-speed message authentication code.
+Poly1305 是一个高性能的 MAC ( message authentication code， 消息认证码 )。
 
-The combination of the ChaCha20 stream cipher with the Poly1305 authenticator was proposed in January 2014 as a faster alternative to the well-studied Salsa20-Poly1305 construction. ChaCha20-Poly1305 was implemented in major operating systems, web browsers and crypto libraries shortly after. It eventually became an official IETF standard in May 2015.
+2014年，提出 ChaCha20 流加密算法和 Poly1305 消息认证码的组合，作为被深入研究的 Salsa20-Poly1305 构造的更快的替代品。
 
-The ChaCha20-Poly1305 implementation in Libsodium is portable across all supported architectures, and is the recommended choice for most applications.
+ ChaCha20-Poly1305 在主流操作系统上都有实现，Web 浏览器 和 密码学库 中随后也都有了实现。2015 年最终成为了正式的  IETF 标准。
+
+libsodium 中的 ChaCha20-Poly1305 实现在所有支持的平台上都是可移植的，并且对绝大多数应用程序来说，都是推荐的首选。
