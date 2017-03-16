@@ -8,7 +8,29 @@ Argon2 的目标是 最高的 内存填充率，和对多个计算单元的有�
 
 Argon2 阻止了 ASIC 硬件相对软件实现产生优势。
 
-## Example 1: 密钥衍生 key derivation
+
+## Example 1: 密码存储 assword storage
+
+```c
+#define PASSWORD "Correct Horse Battery Staple"
+
+char hashed_password[crypto_pwhash_STRBYTES];
+
+if (crypto_pwhash_str
+    (hashed_password, PASSWORD, strlen(PASSWORD),
+     crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE) != 0) {
+    /* out of memory */
+}
+
+if (crypto_pwhash_str_verify
+    (hashed_password, PASSWORD, strlen(PASSWORD)) != 0) {
+    /* wrong password */
+}
+```
+
+
+
+## Example 2: 密钥衍生 key derivation
 
 ```c
 #define PASSWORD "Correct Horse Battery Staple"
@@ -27,24 +49,39 @@ if (crypto_pwhash
 }
 ```
 
-## Example 2: 密码存储 assword storage
+## 密码存储 Password storage
 
 ```c
-#define PASSWORD "Correct Horse Battery Staple"
-
-char hashed_password[crypto_pwhash_STRBYTES];
-
-if (crypto_pwhash_str
-    (hashed_password, PASSWORD, strlen(PASSWORD),
-     crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE) != 0) {
-    /* out of memory */
-}
-
-if (crypto_pwhash_str_verify
-    (hashed_password, PASSWORD, strlen(PASSWORD)) != 0) {
-    /* wrong password */
-}
+int crypto_pwhash_str(char out[crypto_pwhash_STRBYTES],
+                                           const char * const passwd,
+                                           unsigned long long passwdlen,
+                                           unsigned long long opslimit,
+                                           size_t memlimit);
 ```
+
+ `crypto_pwhash_str()` 函数把  ASCII 编码的 字符串写入 `out`, 包含:
+- 一个 对 长度 `passwdlen` 的密码 `passwd ` 进行 内存耗费， CPU 密集 计算，产生的结果。
+- 为进行上述计算自动生成的盐 salt。
+- 用来验证密码 password 需要的其它参数，包括算法标识符，算法版本， `opslimit` 和 `memlimit` 参数.
+
+`out` 必须足够长来保存 `crypto_pwhash_STRBYTES` 字节, 但是实际的输出字符串可能会更短。
+
+输出字符串是 `'\0'` 结尾的，只包括  ASCII 字符串， 并且可以安全的存入  SQL 数据库，和其它存储中。 不需要额外再存其它字段用来 验证 密码 password。
+
+这个函数返回 `0` 表示成功，`-1`表示没有成功完成。
+
+```c
+int crypto_pwhash_str_verify(const char str[crypto_pwhash_STRBYTES],
+                                                  const char * const passwd,
+                                                  unsigned long long passwdlen);
+```
+
+这个函数验证  `str` 是否 对 长度 `passwdlen` 的 `passwd` 是一个 合法的 密码验证字符串 (作为 `crypto_pwhash_str()` 生成的输出) 。
+
+`str` 必须是 `'\0'` 结尾的。
+
+这个函数返回 `0` 表示验证成功了。 `-1`表示验证出错。
+
 
 ## 密钥衍生 Key derivation
 
@@ -80,38 +117,6 @@ Keep in mind that in order to produce the same key from the same password, the s
 
 The function returns `0` on success, and `-1` if the computation didn't complete, usually because the operating system refused to allocate the amount of requested memory.
 
-## 密码存储 Password storage
-
-```c
-int crypto_pwhash_str(char out[crypto_pwhash_STRBYTES],
-                                           const char * const passwd,
-                                           unsigned long long passwdlen,
-                                           unsigned long long opslimit,
-                                           size_t memlimit);
-```
-
- `crypto_pwhash_str()` 函数把  ASCII 编码的 字符串写入 `out`, 包含:
-- 一个 对 长度 `passwdlen` 的密码 `passwd ` 进行 内存耗费， CPU 密集 计算，产生的结果。
-- 为进行上述计算自动生成的盐 salt。
-- 用来验证密码 password 需要的其它参数，包括算法标识符，算法版本， `opslimit` 和 `memlimit` 参数.
-
-`out` 必须足够长来保存 `crypto_pwhash_STRBYTES` 字节, 但是实际的输出字符串可能会更短。
-
-输出字符串是 `'\0'` 结尾的，只包括  ASCII 字符串， 并且可以安全的存入  SQL 数据库，和其它存储中。 不需要额外再存其它字段用来 验证 密码 password。
-
-这个函数返回 `0` 表示成功，`-1`表示没有成功完成。
-
-```c
-int crypto_pwhash_str_verify(const char str[crypto_pwhash_STRBYTES],
-                                                  const char * const passwd,
-                                                  unsigned long long passwdlen);
-```
-
-这个函数验证  `str` 是否 对 长度 `passwdlen` 的 `passwd` 是一个 合法的 密码验证字符串 (作为 `crypto_pwhash_str()` 生成的输出) 。
-
-`str` 必须是 `'\0'` 结尾的。
-
-这个函数返回 `0` 表示验证成功了。 `-1`表示验证出错。
 
 
 ## 选择参数的指导
