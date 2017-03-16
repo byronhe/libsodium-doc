@@ -1,23 +1,23 @@
-# Securing memory allocations
+# 安全的内容分配
 
-## Zeroing memory
+## 内存清零
 
 ```c
 void sodium_memzero(void * const pnt, const size_t len);
 ```
 
-After use, sensitive data should be overwritten, but `memset()` and hand-written code can be silently stripped out by an optimizing compiler or by the linker.
+使用之后，敏感数据会被覆盖。但是 `memset()`手写的代码会被编译器优化或链接器悄悄地删掉。 
 
-The `sodium_memzero()` function tries to effectively zero `len` bytes starting at `pnt`, even if optimizations are being applied to the code.
+ `sodium_memzero()` 函数尝试有效地清零 `pnt` 指向的 `len` 字节，不管编译器如何优化。
 
-## Locking memory
+## 锁内存
 
 ```c
 int sodium_mlock(void * const addr, const size_t len);
 ```
 
-The `sodium_mlock()` function locks at least `len` bytes of memory starting at `addr`. This can help avoid swapping sensitive data to disk.
-
+ `sodium_mlock()` 函数锁住 最少从 `addr` 开始的  `len` 字节。 这可以帮助防止 敏感数据被  swap 到磁盘进而泄露出去。
+ 
 In addition, it is recommended to totally disable swap partitions on machines processing senstive data, or, as a second choice, use encrypted swap partitions.
 
 For similar reasons, on Unix systems, one should also disable core dumps when running crypto code outside a development environment. This can be achieved using a shell built-in such as `ulimit` or programatically using `setrlimit(RLIMIT_CORE, &(struct rlimit) {0, 0})`.
