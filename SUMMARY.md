@@ -8,7 +8,7 @@
 * [辅助方法](helpers/README.md)
 * [安全内存管理](helpers/memory_management.md)
 * [随机数生成](generating_random_data/README.md)
-* [对称密码学 Secret-key cryptography](secret-key_cryptography/README.md)
+* [对称密码学](secret-key_cryptography/README.md)
    * [认证加密](secret-key_cryptography/authenticated_encryption.md)
    * [认证](secret-key_cryptography/secret-key_authentication.md)
    * [AEAD构造](secret-key_cryptography/aead.md)
