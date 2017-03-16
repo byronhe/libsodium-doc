@@ -1,4 +1,4 @@
-# Public-key authenticated encryption
+# 公钥密码学 认证加密 Public-key authenticated encryption
 
 ## Example
 
@@ -46,7 +46,7 @@ The nonce doesn't have to be confidential, but it should be used with just one i
 
 One easy way to generate a nonce is to use `randombytes_buf()`, considering the size of nonces the risk of any random collisions is negligible. For some applications, if you wish to use nonces to detect missing messages or to ignore replayed messages, it is also ok to use a simple incrementing counter as a nonce.
 
-When doing so you must ensure that the same value can never be re-used (for example you may have multiple threads or even hosts generating messages using the same key pairs).
+When doing so you must ensure that the same value can never be re-used \(for example you may have multiple threads or even hosts generating messages using the same key pairs\).
 
 This system provides mutual authentication. However, a typical use case is to secure communications between a server, whose public key is known in advance, and clients connecting anonymously.
 
@@ -56,14 +56,14 @@ This system provides mutual authentication. However, a typical use case is to se
 int crypto_box_keypair(unsigned char *pk, unsigned char *sk);
 ```
 
-The `crypto_box_keypair()` function randomly generates a secret key and a corresponding public key. The public key is put into `pk` (`crypto_box_PUBLICKEYBYTES` bytes) and the secret key into `sk` (`crypto_box_SECRETKEYBYTES` bytes).
+The `crypto_box_keypair()` function randomly generates a secret key and a corresponding public key. The public key is put into `pk` \(`crypto_box_PUBLICKEYBYTES` bytes\) and the secret key into `sk` \(`crypto_box_SECRETKEYBYTES` bytes\).
 
 ```c
 int crypto_box_seed_keypair(unsigned char *pk, unsigned char *sk,
                             const unsigned char *seed);
 ```
 
-Using `crypto_box_seed_keypair()`, the key pair can also be deterministically derived from a single key `seed` (`crypto_box_SEEDBYTES` bytes).
+Using `crypto_box_seed_keypair()`, the key pair can also be deterministically derived from a single key `seed` \(`crypto_box_SEEDBYTES` bytes\).
 
 ```c
 int crypto_scalarmult_base(unsigned char *q, const unsigned char *n);
@@ -104,14 +104,14 @@ int crypto_box_open_easy(unsigned char *m, const unsigned char *c,
 
 The `crypto_box_open_easy()` function verifies and decrypts a ciphertext produced by `crypto_box_easy()`.
 
-`c` is a pointer to an authentication tag + encrypted message combination, as produced by `crypto_box_easy()`.
+`c` is a pointer to an authentication tag + encrypted message combination, as produced by `crypto_box_easy()`.  
 `clen` is the length of this authentication tag + encrypted message combination. Put differently, `clen` is the number of bytes written by `crypto_box_easy()`, which is `crypto_box_MACBYTES` + the length of the message.
 
 The nonce `n` has to match the nonce used to encrypt and authenticate the message.
 
 `pk` is the public key of the sender that encrypted the message. `sk` is the secret key of the recipient that is willing to verify and decrypt it.
 
-The function returns `-1` if the verification fails, and `0` on success.
+The function returns `-1` if the verification fails, and `0` on success.  
 On success, the decrypted message is stored into `m`.
 
 `m` and `c` can overlap, making in-place decryption possible.
@@ -164,7 +164,7 @@ int crypto_box_beforenm(unsigned char *k, const unsigned char *pk,
                         const unsigned char *sk);
 ```
 
-The `crypto_box_beforenm()` function computes a shared secret key given a public key `pk` and a secret key `sk`, and puts it into `k` (`crypto_box_BEFORENMBYTES` bytes).
+The `crypto_box_beforenm()` function computes a shared secret key given a public key `pk` and a secret key `sk`, and puts it into `k` \(`crypto_box_BEFORENMBYTES` bytes\).
 
 ```c
 int crypto_box_easy_afternm(unsigned char *c, const unsigned char *m,
@@ -187,22 +187,22 @@ int crypto_box_open_detached_afternm(unsigned char *m, const unsigned char *c,
 
 The `_afternm` variants of the previously described functions accept a precalculated shared secret key `k` instead of a key pair.
 
-Like any secret key, a precalculated shared key should be wiped from memory (for example using `sodium_memzero()`) as soon as it is not needed any more.
+Like any secret key, a precalculated shared key should be wiped from memory \(for example using `sodium_memzero()`\) as soon as it is not needed any more.
 
 ## Constants
 
-- `crypto_box_PUBLICKEYBYTES`
-- `crypto_box_SECRETKEYBYTES`
-- `crypto_box_MACBYTES`
-- `crypto_box_NONCEBYTES`
-- `crypto_box_SEEDBYTES`
-- `crypto_box_BEFORENMBYTES`
+* `crypto_box_PUBLICKEYBYTES`
+* `crypto_box_SECRETKEYBYTES`
+* `crypto_box_MACBYTES`
+* `crypto_box_NONCEBYTES`
+* `crypto_box_SEEDBYTES`
+* `crypto_box_BEFORENMBYTES`
 
 ## Algorithm details
 
-- Key exchange: X25519
-- Encryption: XSalsa20 stream cipher
-- Authentication: Poly1305 MAC
+* Key exchange: X25519
+* Encryption: XSalsa20 stream cipher
+* Authentication: Poly1305 MAC
 
 ## Notes
 
@@ -211,3 +211,4 @@ The original NaCl `crypto_box` API is also supported, albeit not recommended.
 `crypto_box()` takes a pointer to 32 bytes before the message, and stores the ciphertext 16 bytes after the destination pointer, the first 16 bytes being overwritten with zeros. `crypto_box_open()` takes a pointer to 16 bytes before the ciphertext and stores the message 32 bytes after the destination pointer, overwriting the first 32 bytes with zeros.
 
 The `_easy` and `_detached` APIs are faster and improve usability by not requiring padding, copying or tricky pointer arithmetic.
+
