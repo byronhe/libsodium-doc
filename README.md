@@ -8,7 +8,7 @@ libsodium 的目标是提供构建高层密码学工具所需的核心算法。
 
 libsodium 支持一系列编译器和操作系统，包括 iOS ， Android，和 Windows(使用 MinGW 或者 Visual Studio, x86 和 x86_64)。
 
-libsodium 的设计强调*高安全*，强调任何“神奇”的常量数字都要有来源根据（无来历不明的常量）。除了强调高安全性，基础算法的*性能*也全面超越 NIST 标准下的绝大多数其他实现。
+libsodium 的设计强调**高安全**，强调任何“神奇”的常量数字都要有来源根据（无来历不明的常量）。除了强调高安全性，基础算法的**性能**也全面超越 NIST 标准下的绝大多数其他实现。
 
 [Version 1.0.10](https://github.com/jedisct1/libsodium/releases) 发布于 Apr 5, 2016.
 
