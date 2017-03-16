@@ -1,29 +1,27 @@
-# Helpers
+# 辅助方法
 
-## Constant-time test for equality
+## 常数时间的比较函数 
 
 ```c
 int sodium_memcmp(const void * const b1_, const void * const b2_, size_t len);
 ```
+当在 秘密数据（比如 密钥， 认证的tag gcm的tag 等 ）上进行 比较操作的时候，非常重要的是:一定要使用一个 常数时间的比较函数，来免疫侧信道攻击 。
 
-When a comparison involves secret data (e.g. key, authentication tag), is it critical to use a constant-time comparison function in order to mitigate side-channel attacks.
 
-The `sodium_memcmp()` function can be used for this purpose.
+ `sodium_memcmp()` 就是用来做常数时间比较的。
+ `sodium_memcmp()` 返回 `0` 如果  `b1_` 指向的 `len` 字节  和  `b2_` 指向的 `len` 相同. 否则，返回 `-1`.
 
-The function returns `0` if the `len` bytes pointed to by `b1_` match the `len` bytes pointed to by `b2_`. Otherwise, it returns `-1`.
+**注意:** `sodium_memcmp()` 不会做字典序比较，不判断大小关系，只判断是否相等。并且也不是 `memcmp()` 的通用替代品。
 
-**Note:** `sodium_memcmp()` is not a lexicographic comparator and is not a generic replacement for `memcmp()`.
-
-## Hexadecimal encoding/decoding
+## 十六进制 encoding/decoding
 
 ```c
 char *sodium_bin2hex(char * const hex, const size_t hex_maxlen,
                      const unsigned char * const bin, const size_t bin_len);
 ```
 
-The `sodium_bin2hex()` function converts `bin_len` bytes stored at `bin` into a hexadecimal string.
-
-The string is stored into `hex` and includes a nul byte (`\0`) terminator.
+`sodium_bin2hex()` 把 `bin` 指向的 `bin_len` 转换成 十六进制的 字符串。
+结果十六进制字符串存入 `hex` 中，并且包含一个 null ( `\0` ) 结束字节。
 
 `hex_maxlen` is the maximum number of bytes that the function is allowed to write starting at `hex`. It should be at least `bin_len * 2 + 1`.
 
