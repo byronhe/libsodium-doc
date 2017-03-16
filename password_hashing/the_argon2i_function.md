@@ -6,7 +6,7 @@ Argon2 集成了目前在内存耗费函数设计领域 最先进的技术。
 
 Argon2 的目标是 最高的 内存填充率，和对多个计算单元的有效利用，同时仍然提供针对 tradeoff 攻击的有效防御。
 
-Argon2 阻止了 ASIC 硬件相对软件实现产生优势。
+Argon2 避免了 ASIC 硬件相对 软件实现 的性能优势。
 
 
 ## Example 1: 密码存储 assword storage
@@ -141,7 +141,7 @@ The function returns `0` on success, and `-1` if the computation didn't complete
 
 但是针对 brute-force 暴力攻击密码破解的最好防御，仍然是使用强密码，像 [passwdqc](http://www.openwall.com/passwdqc/) 这样的库，可以用来确保强密码。
 
-## Constants
+## 常量
 
 - `crypto_pwhash_ALG_DEFAULT`
 - `crypto_pwhash_SALTBYTES`
@@ -156,23 +156,23 @@ The function returns `0` on success, and `-1` if the computation didn't complete
 
 ## Notes
 
-`opslimit`, the number of passes, has to be at least `3`. `crypto_pwhash()` and `crypto_pwhash_str()` will fail with a `-1` return code for lower values.
+`opslimit`, 计算的遍数，最少必须是 `3`。 对更小的值，`crypto_pwhash()` 和 `crypto_pwhash_str()` 会失败返回 `-1` 。
 
-There is no "insecure" value for `memlimit`, though the more memory the better.
+对 `memlimit` 没有 "不安全"值，尽管内存越多越好。
 
-Do not forget to initialize the library with `sodium_init()`. `crypto_pwhash_*` will still work without doing so, but possibly way slower.
+不要忘了用  `sodium_init()` 初始化整个库。 `crypto_pwhash_*` 在没有初始化的情况下仍然会工作，但是可能会变慢。
 
-Do not use constants (including `crypto_pwhash_OPSLIMIT_*` and `crypto_pwhash_MEMLIMIT_*`) in order to verify a password. Save the parameters along with the hash instead, and use these saved parameters for the verification.
+不要使用常量  (包括 `crypto_pwhash_OPSLIMIT_*` 和 `crypto_pwhash_MEMLIMIT_*`) 来验证一个 password ，把这些参数和 hash 保存在一起，并且使用保存的参数来做验证。
 
-Alternatively, use `crypto_pwhash_str()` and `crypto_pwhash_str_verify()`, that automatically take care of including and extracting the parameters.
+或者,使用 `crypto_pwhash_str()` 和 `crypto_pwhash_str_verify()`, 这组函数 会自动处理 包含 和提取这些参数的细节。
 
-By doing so, passwords can be rehashed using different parameters if required later on.
+通过这样做，以后如果需要，password 以后可以使用不同的参数重新哈希。
 
-Cleartext passwords should not stay in memory longer than needed.
+明文的密码不再需要以后，就不应该再停留在内存里。
 
-It is highly recommended to use `sodium_mlock()` to lock memory regions storing cleartext passwords, and to call `sodium_munlock()` right after `crypto_pwhash_str()` and `crypto_pwhash_str_verify()` return.
+高度推荐使用 `sodium_mlock()` 来把存储明文密码的内存区域锁定住，并在 `crypto_pwhash_str()` 和 `crypto_pwhash_str_verify()` 返回后，调用 `sodium_munlock()` 。
 
-`sodium_munlock()` overwrites the region with zeros before unlocking it, so it doesn't have to be done before calling this function.
+`sodium_munlock()` 在 unlock 之前， 会用 0 覆盖这个区域，所以不需要再自己做覆盖操作。
 
 ## Algorithm details
 
