@@ -23,9 +23,11 @@ char *sodium_bin2hex(char * const hex, const size_t hex_maxlen,
 `sodium_bin2hex()` 把 `bin` 指向的 `bin_len` 转换成 十六进制的 字符串。  
 结果十六进制字符串存入 `hex` 中，并且包含一个 null \( `\0` \) 结束字节。
 
-`hex_maxlen` is the maximum number of bytes that the function is allowed to write starting at `hex`. It should be at least `bin_len * 2 + 1`.
+`hex_maxlen` 是从 `hex` 开始可以写入的最大长度，`hex_maxlen`最少应该是  `bin_len * 2 + 1`.
 
-The function returns `hex` on success, or `NULL` on overflow. It evaluates in constant time for a given size.
+这个函数返回 `hex` 表示成功，返回`NULL`表示 `hex`长度不够。
+对一个给定的输入大小，这个函数的执行时间是个常量。
+
 
 ```c
 int sodium_hex2bin(unsigned char * const bin, const size_t bin_maxlen,
@@ -34,77 +36,75 @@ int sodium_hex2bin(unsigned char * const bin, const size_t bin_maxlen,
                    const char ** const hex_end);
 ```
 
-The `sodium_hex2bin()` function parses a hexadecimal string `hex` and converts it to a byte sequence.
+ `sodium_hex2bin()` 函数解析一个十六进制字符串 `hex` 并且把它转换成一个字节序列。
+ 
+`hex` 不需要以 null \('\0'\) 结尾，因为需要解析的字符串的长度已经由 `hex_len` 指定了。
 
-`hex` does not have to be nul terminated, as the number of characters to parse is supplied via the `hex_len` parameter.
 
-`ignore` is a string of characters to skip. For example, the string `": "` allows columns and spaces to be present at any locations in the hexadecimal string. These characters will just be ignored. As a result, `"69:FC"`, `"69 FC"`, `"69 : FC"` and `"69FC"` will be valid inputs, and will produce the same output.
+`ignore` 是需要跳过的字符组成的字符串，例如，字符串 `": "` 允许空格和冒号在十六进制字符串中的任何位置。这些字符会被忽略，这样, `"69:FC"`, `"69 FC"`, `"69 : FC"` 和 `"69FC"` 就是合法的输入，并产生相同的输出。
 
-`ignore` can be set to `NULL` in order to disallow any non-hexadecimal character.
+`ignore` 可以设成  `NULL`，这样就不允许任何非十六进制的字符。
 
-`bin_maxlen` is the maximum number of bytes to put into `bin`.
 
-The parser stops when a non-hexadecimal, non-ignored character is found or when `bin_maxlen` bytes have been written.
+`bin_maxlen` 是 `bin` 能容纳的长度。
 
-The function returns `-1` if more than `bin_maxlen` bytes would be required to store the parsed string.  
-It returns `0` on success and sets `hex_end`, if it is not `NULL`, to a pointer to the character following the last parsed character.
+解析器会在发现非十六进制的非忽略字符，或 `bin_maxlen`限制到达的时候停止。
 
-It evaluates in constant time for a given length and format.
+这个函数返回 `-1` 表示 `bin_maxlen`不够长，放不下结果。返回`0`表示成功，并且设置 `hex_end`。如果 `hex_end`不是 `NULL`，那就指向已经解析完成的字符的下一个字符。
+ 
+对给定的长度和格式，这个函数的执行时间是常量。
 
-## Incrementing large numbers
+## 增长大数字
 
 ```c
 void sodium_increment(unsigned char *n, const size_t nlen);
 ```
 
-The `sodium_increment()` function takes a pointer to an arbitrary-long unsigned number, and increments it.
+ `sodium_increment()` 函数接受一个指向任意长度的无符号数字的指针，对其做增长操作。
+ 
+这个函数对给定长度，运行时间是个常量。并且假设数字是小端字节序的。
 
-It runs in constant-time for a given length, and considers the number to be encoded in little-endian format.
+`sodium_increment()` 可以用于以常量时间增长nonce字段。
 
-`sodium_increment()` can be used to increment nonces in constant time.
+这个函数是 libsodium 1.0.4 引入的。
 
-This function was introduced in libsodium 1.0.4.
-
-## Adding large numbers
+## 大数字的加法 
 
 ```c
 void sodium_add(unsigned char *a, const unsigned char *b, const size_t len);
 ```
 
-The `sodium_add()` function accepts two pointers to unsigned numbers encoded in little-endian format, `a` and `b`, both of size `len` bytes.
+  `sodium_add()` 函数接受两个指向无符号小端字节序数字的指针，`a` 和 `b`, 两个都是 `len` 字节长。
+  
+并计算 `(a + b) mod 2^(8*len)` ，对给定长度，运行时间是常数，并且用结果覆盖 `a`。
 
-It computes `(a + b) mod 2^(8*len)` in constant time for a given length, and overwrites `a` with the result.
+这个函数是 libsodium 1.0.7 引入的.
 
-This function was introduced in libsodium 1.0.7.
-
-## Comparing large numbers
+## 比较大数字
 
 ```c
 int sodium_compare(const void * const b1_, const void * const b2_, size_t len);
 ```
 
-Given `b1_` and `b2_`, two `len` bytes numbers encoded in little-endian format, this function returns:
+给定 `b1_` 和 `b2_`, 两个 `len` 字节长度的小端字节序数字， 本函数返回:
 
-* `-1` if `b1_` is less than `b2_`
-* `0` if `b1_` equals `b2_`
-* `1` if `b1_` is greater than `b2_` 
+* `-1` 如果 `b1_` 小于 `b2_`
+* `0`  如果 `b1_` 等于 `b2_`
+* `1`  如果 `b1_` 大于 `b2_` 
 
-The comparison is done in constant time for a given length.
 
-This function can be used with nonces, in order to prevent replay attacks.
+这个比较对给定长度，是常数时间的操作。
+这个函数可以用于nonce的比较，用来阻止 重放攻击。
+这个函数是 libsodium 1.0.6 引入的.
 
-It was introduced in libsodium 1.0.6.
-
-## Testing for all zeros
+## 全零测试
 
 ```c
 int sodium_is_zero(const unsigned char *n, const size_t nlen);
 ```
 
-This function returns `1` is the `nlen` bytes vector pointed by `n` contains only zeros.  
-It returns `0` if non-zero bits are found.
+这个函数返回 `1`，表示 `n`指向的 `nlen`字节的数组只包含0 。
+返回`0`表示发现有非0的比特。
 
-Its execution time is constant for a given length.
-
-This function was introduced in libsodium 1.0.7.
-
+对给定长度，本函数的执行时间是常量。
+本函数是 libsodium 1.0.7 引入的。
