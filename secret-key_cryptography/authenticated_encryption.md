@@ -1,6 +1,6 @@
-# Secret-key authenticated encryption
+# 对称密码学 认证加密
 
-## Example
+## 例子
 
 ```c
 #define MESSAGE ((const unsigned char *) "test")
@@ -21,15 +21,16 @@ if (crypto_secretbox_open_easy(decrypted, ciphertext, CIPHERTEXT_LEN, nonce, key
 }
 ```
 
-## Purpose
+## 目的
 
-This operation:
-- Encrypts a message with a key and a nonce to keep it confidential
-- Computes an authentication tag. This tag is used to make sure that the message hasn't been tampered with before decrypting it.
+这个操作:
+- 用 一个 key  和 一个 nonce 加密一个消息，让消息保持保密。
+- 计算一个 认证 tag。 这个tag 用于确保消息在解密之前没有被篡改过。
 
-A single key is used both to encrypt/sign and verify/decrypt messages. For this reason, it is critical to keep the key confidential.
 
-The nonce doesn't have to be confidential, but it should never ever be reused with the same key. The easiest way to generate a nonce is to use `randombytes_buf()`.
+一个单一的 key 同时用于 加密/签名 ,  和 验证/解密 消息。 因此，保证 key 保密，是极其重要的。
+nonce不需要保密，但是绝对不能在同一个key下重复使用。生成一个 nonce 的最简单办法是使用 `randombytes_buf()`。
+
 
 ## Combined mode
 
