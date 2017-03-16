@@ -16,8 +16,8 @@ libsodium 的设计强调**高安全**，强调任何“神奇”的常量数字
 
 - [Github repository](https://github.com/jedisct1/libsodium)
 - [源代码 和 预编译的二进制包](https://download.libsodium.org/libsodium/releases/)
-- [在线文档](http://doc.libsodium.org)
-- [文档目录](SUMMARY.md)
+- [官方在线英文文档](http://doc.libsodium.org)
+- [文档总览目录](SUMMARY.md)
 
 ## 邮件列表
 有一个讨论 libsodium 的邮件列表
