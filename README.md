@@ -12,13 +12,14 @@ libsodium 的设计强调**高安全**，强调任何“神奇”的常量数字
 
 [Version 1.0.10](https://github.com/jedisct1/libsodium/releases) 发布于 Apr 5, 2016.
 
-## Downloading libsodium
+## 下载 libsodium
 
 - [Github repository](https://github.com/jedisct1/libsodium)
-- [Tarballs and pre-compiled binaries](https://download.libsodium.org/libsodium/releases/)
-- [Documentation](http://doc.libsodium.org)
+- [源代码 和 预编译的二进制包](https://download.libsodium.org/libsodium/releases/)
+- [在线文档](http://doc.libsodium.org)
+- [文档目录](SUMMARY.md)
 
-## Mailing list
+## 邮件列表
 有一个讨论 libsodium 的邮件列表
 
 In order to join, just send a random mail to `sodium-subscribe` {at}
