@@ -49,9 +49,9 @@ int crypto_secretbox_easy(unsigned char *c, const unsigned char *m,
 
 `c` 应该最少是 `crypto_secretbox_MACBYTES + mlen` 字节长.
 
-消息密文的长度也是 `mlen` 字节， 这个函数把 `crypto_secretbox_MACBYTES`  字节长的 认证tag ， 在 `c` 中追加在 消息密文 后面 。
+消息密文的长度也是 `mlen` 字节， 这个函数先在 `c` 中 写入 `crypto_secretbox_MACBYTES`  字节长的 认证tag ， 然后追加加密后的 消息密文  。
 
-`c` 和 `m` 内存区间可以重叠, 因此可以做 ‘原地加密’ 。当然不要忘记 要有额外的 `crypto_secretbox_MACBYTES` 字节用于追加写 认证 tag。
+`c` 和 `m` 内存区间可以重叠, 因此可以做 ‘原地加密’ 。当然不要忘记 要有额外的 `crypto_secretbox_MACBYTES` 字节用于写入 认证 tag。
 
 
 ```c
@@ -62,7 +62,7 @@ int crypto_secretbox_open_easy(unsigned char *m, const unsigned char *c,
 
 `crypto_secretbox_open_easy()` 函数 验证 并 解密  `crypto_secretbox_easy()` 生成的密文。
 
-`c` 是个指针，指向 `crypto_secretbox_easy()` 生成的 消息密文 + 认证tag 的组合buffer。`clen` 是 这个组合的buffer的长度，换句话说，就是  `crypto_secretbox_MACBYTES` + 明文消息的长度。
+`c` 是个指针，指向 `crypto_secretbox_easy()` 生成的  认证tag + 消息密文  的组合buffer。`clen` 是 这个组合的buffer的长度，换句话说，就是  `crypto_secretbox_MACBYTES` + 明文消息 的长度。
 
 
  nonce `n` 和 key `k` 必须和 加密/认证时候用的  nonce 和  相同。
@@ -114,14 +114,14 @@ int crypto_secretbox_open_detached(unsigned char *m,
 
 ## 算法细节
 
-- 加密 Encryption: XSalsa20 stream cipher
-- 认证 Authentication: Poly1305 MAC
+- 加密算法 Encryption: XSalsa20 流加密算法
+- 认证算法 Authentication: Poly1305 MAC算法
 
 ## 注意
 
  NaCl 原来的 `crypto_secretbox` API 也支持， 尽管不推荐。
- 
- 
-`crypto_secretbox()` takes a pointer to 32 bytes before the message, and stores the ciphertext 16 bytes after the destination pointer, the first 16 bytes being overwritten with zeros. `crypto_secretbox_open()` takes a pointer to 16 bytes before the ciphertext and stores the message 32 bytes after the destination pointer, overwriting the first 32 bytes with zeros.
 
-The `_easy` and `_detached` APIs are faster and improve usability by not requiring padding, copying or tricky pointer arithmetic.
+ 
+`crypto_secretbox()` 接受 一个指向 消息之前32字节的指针，并且把密文写入 目的地指针之后 16字节， 并把目的地指针的指向的前16字节填充成0 。 `crypto_secretbox_open()` 接受一个指向密文前 16字节的指针，并把消息存入 目的地指针的 32字节后， 并把目的地指针的前32字节填充成0。
+
+ `_easy` 和 `_detached`  API 更快，并且改进了易用性，不再需要 padding 填充，拷贝，和指针计算。
