@@ -9,7 +9,7 @@ Argon2 的目标是 最高的 内存填充率，和对多个计算单元的有�
 Argon2 避免了 ASIC 硬件相对 软件实现 的性能优势。
 
 
-## Example 1: 密码存储 assword storage
+## Example 1: 密码存储 password storage
 
 ```c
 #define PASSWORD "Correct Horse Battery Staple"
