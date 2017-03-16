@@ -1,15 +1,15 @@
-# 辅助方法
+# 辅助函数
 
-## 常数时间的比较函数 
+## 常数时间的比较函数
 
 ```c
 int sodium_memcmp(const void * const b1_, const void * const b2_, size_t len);
 ```
+
 当在 秘密数据（比如 密钥， 认证的tag gcm的tag 等 ）上进行 比较操作的时候，非常重要的是:一定要使用一个 常数时间的比较函数，来免疫侧信道攻击 。
 
-
- `sodium_memcmp()` 就是用来做常数时间比较的。
- `sodium_memcmp()` 返回 `0` 如果  `b1_` 指向的 `len` 字节  和  `b2_` 指向的 `len` 相同. 否则，返回 `-1`.
+`sodium_memcmp()` 就是用来做常数时间比较的。  
+ `sodium_memcmp()` 返回 `0` 如果  `b1_` 指向的 `len` 字节  和  `b2_` 指向的 `len` 相同. 否则，返回 `-1`.
 
 **注意:** `sodium_memcmp()` 不会做字典序比较，不判断大小关系，只判断是否相等。并且也不是 `memcmp()` 的通用替代品。
 
@@ -20,8 +20,8 @@ char *sodium_bin2hex(char * const hex, const size_t hex_maxlen,
                      const unsigned char * const bin, const size_t bin_len);
 ```
 
-`sodium_bin2hex()` 把 `bin` 指向的 `bin_len` 转换成 十六进制的 字符串。
-结果十六进制字符串存入 `hex` 中，并且包含一个 null ( `\0` ) 结束字节。
+`sodium_bin2hex()` 把 `bin` 指向的 `bin_len` 转换成 十六进制的 字符串。  
+结果十六进制字符串存入 `hex` 中，并且包含一个 null \( `\0` \) 结束字节。
 
 `hex_maxlen` is the maximum number of bytes that the function is allowed to write starting at `hex`. It should be at least `bin_len * 2 + 1`.
 
@@ -46,7 +46,7 @@ The `sodium_hex2bin()` function parses a hexadecimal string `hex` and converts i
 
 The parser stops when a non-hexadecimal, non-ignored character is found or when `bin_maxlen` bytes have been written.
 
-The function returns `-1` if more than `bin_maxlen` bytes would be required to store the parsed string.
+The function returns `-1` if more than `bin_maxlen` bytes would be required to store the parsed string.  
 It returns `0` on success and sets `hex_end`, if it is not `NULL`, to a pointer to the character following the last parsed character.
 
 It evaluates in constant time for a given length and format.
@@ -84,9 +84,10 @@ int sodium_compare(const void * const b1_, const void * const b2_, size_t len);
 ```
 
 Given `b1_` and `b2_`, two `len` bytes numbers encoded in little-endian format, this function returns:
-- `-1` if `b1_` is less than `b2_`
-- `0` if `b1_` equals `b2_`
-- `1` if `b1_` is greater than `b2_` 
+
+* `-1` if `b1_` is less than `b2_`
+* `0` if `b1_` equals `b2_`
+* `1` if `b1_` is greater than `b2_` 
 
 The comparison is done in constant time for a given length.
 
@@ -100,9 +101,10 @@ It was introduced in libsodium 1.0.6.
 int sodium_is_zero(const unsigned char *n, const size_t nlen);
 ```
 
-This function returns `1` is the `nlen` bytes vector pointed by `n` contains only zeros.
+This function returns `1` is the `nlen` bytes vector pointed by `n` contains only zeros.  
 It returns `0` if non-zero bits are found.
 
 Its execution time is constant for a given length.
 
 This function was introduced in libsodium 1.0.7.
+
