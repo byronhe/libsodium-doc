@@ -1,4 +1,4 @@
-# Usage
+# 使用方法
 
 ```c
 #include <sodium.h>
@@ -12,23 +12,22 @@ int main(void)
 }
 ```
 
-`sodium.h` is the only header that has to be included.
+`sodium.h` 是唯一需要包含的头文件。
 
-The library is called `sodium` (use `-lsodium` to link it), and proper compilation/linker flags can be obtained using `pkg-config` on systems where it is available:
+库的名字是 `sodium` (使用 `-lsodium` 来链接)。 在支持的系统上，一般可以使用 `pkg-config` 来获取 编译 和 链接 的参数。 
 
 ```bash
 CFLAGS=$(pkg-config --cflags libsodium)
 LDFLAGS=$(pkg-config --libs libsodium)
 ```
 
-For static linking, Visual Studio users should define `SODIUM_STATIC=1` and `SODIUM_EXPORT=`. This is not required on other platforms.
+对静态链接，Visual Studio 用户需要定义  `SODIUM_STATIC=1` 和 `SODIUM_EXPORT=`. 其他平台不需要。
 
-`sodium_init()` initializes the library and should be called before any other function provided by Sodium.
-The function can be called more than once, but it should not be executed by multiple threads simultaneously. Add appropriate locks around the function call if this scenario can happen in your application.
+`sodium_init()` 初始化 libsodium 库，并且必须在 libsodium 库的其他任何函数之前被调用。这个函数可以被多次重复调用，但是不能多个线程并发调用，如果你的程序中有这种场景，你应该自己加锁。
 
-After this function returns, all of the other functions provided by Sodium will be thread-safe.
+`sodium_init()`返回后，libsodium 的其他所有函数都是 线程安全 的。
 
-`sodium_init()` doesn't perform any memory allocations. However, on Unix systems, it opens `/dev/urandom` and keeps the descriptor open, so that the device remains accessible after a `chroot()` call.
-Multiple calls to `sodium_init()` do not cause additional descriptors to be opened.
+`sodium_init()` 不会做任何 内存分配。 但是，在 Unix 系统中， 会打开 `/dev/urandom` 文件，并且会保持这个文件 fd 打开，因此在`chroot()`之后，`/dev/urandom`仍然能使用。多次调用 `sodium_init()` 会导致多个 fd 被打开。
 
-`sodium_init()` returns `0` on success, `-1` on failure, and `1` is the library had already been initialized.
+
+`sodium_init()` 返回 `0` 表示 成功, `-1` 表示 失败,  `1` 表示库已经被初始化过了。
