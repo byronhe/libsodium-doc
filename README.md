@@ -2,7 +2,7 @@
 
 Sodium 是一个用于加密，解密，数字签名，密码哈希，等等的，现代的，易用的库。
 
-libsodium 是  [NaCl](http://nacl.cr.yp.to/) 的易于移植的，可以交叉编译，可安装打包的 fork，并有和 NaCL 兼容的 APi，和进一步增强了易用性的扩展API。
+libsodium 是 [NaCl](http://nacl.cr.yp.to/) 的一个分支。着重于易于移植，可交叉编译，可安装打包的，并有和 NaCL 兼容的 API，并进一步增强了易用的扩展API。
 
 libsodium 的目标是提供构建高层密码学工具需要的核心算法。
 
