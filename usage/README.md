@@ -21,7 +21,7 @@ CFLAGS=$(pkg-config --cflags libsodium)
 LDFLAGS=$(pkg-config --libs libsodium)
 ```
 
-对静态链接，Visual Studio 用户需要定义  `SODIUM_STATIC=1` 和 `SODIUM_EXPORT=`. 其他平台不需要。
+对静态链接，Visual Studio 用户需要定义  `SODIUM_STATIC=1` 和 `SODIUM_EXPORT=` ，其他平台不需要。
 
 `sodium_init()` 初始化 libsodium 库，并且必须在 libsodium 库的其他任何函数之前被调用。这个函数可以被多次重复调用，但是不能多个线程并发调用，如果你的程序中有这种场景，你应该自己加锁。
 
