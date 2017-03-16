@@ -12,7 +12,7 @@
 * [对称密码学](secret-key_cryptography/README.md)
    * [认证加密](secret-key_cryptography/authenticated_encryption.md)
    * [认证](secret-key_cryptography/secret-key_authentication.md)
-   * [AEAD构造](secret-key_cryptography/aead.md)
+   * [AEAD构造](secret-key_cryptography/aead.md)
        * [ChaCha20-Poly1305](secret-key_cryptography/chacha20-poly1305.md)
            * [Original ChaCha20-Poly1305 construction](secret-key_cryptography/original_chacha20-poly1305_construction.md)
            * [IETF ChaCha20-Poly1305 construction](secret-key_cryptography/ietf_chacha20-poly1305_construction.md)
