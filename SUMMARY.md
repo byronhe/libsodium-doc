@@ -34,7 +34,7 @@
    * [SHA-2](advanced/sha-2_hash_function.md)
    * [HMAC-SHA-2](advanced/hmac-sha2.md)
    * [一次性密码认证](advanced/poly1305.md)
-   * [流密码算法](advanced/stream_ciphers.md)
+   * [流加密算法](advanced/stream_ciphers.md)
        * [ChaCha20](advanced/chacha20.md)
        * [Salsa20](advanced/salsa20.md)
        * [XSalsa20](advanced/xsalsa20.md)
