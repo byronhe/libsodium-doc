@@ -1,6 +1,6 @@
-# Secret-key authentication
+# 对称密码学 认证算法
 
-## Example
+## 例子
 
 ```c
 #define MESSAGE (const unsigned char *) "test"
@@ -17,48 +17,48 @@ if (crypto_auth_verify(mac, MESSAGE, MESSAGE_LEN, key) != 0) {
 }
 ```
 
-## Purpose
+## 目的
 
-This operation computes an authentication tag for a message and a secret key, and provides a way to verify that a given tag is valid for a given message and a key.
+这个操作使用一个 key 计算一个消息的 认证tag，并提供一种方式来验证一个 tag 对 给定消息和 key 是否合法。
 
-The function computing the tag deterministic: the same (message, key) tuple will always produce the same output.
+这个函数确定地计算 认证tag： 相同的 (消息， key) 二元组，总是产生出相同的输出 tag。
+然后，就算消息是公开的，也要求知道 key 才能计算出合法的 tag。 因此，key 应该保持保密。 tag 是可以公开的。
 
-However, even if the message is public, knowing the key is required in order to be able to compute a valid tag. Therefore, the key should remain confidential. The tag, however, can be public.
 
-A typical use case is:
-- `A` prepares a message, add an authentication tag, sends it to `B`
-- `A` doesn't store the message
-- Later on, `B` sends the message and the authentication tag to `A`
-- `A` uses the authentication tag to verify that it created this message.
+一个典型的使用案例是：
+- `A` 准备一个消息，加上一个认证tag，发送给 `B`。
+- `A` 不存储这条消息。
+- 过一会，`B` 发送这条消息和认证 tag 给 `A`。
+- `A` 使用认证 tag 来验证 确实是自己创建了这条消息。
 
-This operation does *not* encrypt the message. It only computes and verifies an authentication tag.
+这种操作 **并不加密** 这条消息，只是生成和验证 认证tag。
 
-## Usage
+
+## 使用
 
 ```c
 int crypto_auth(unsigned char *out, const unsigned char *in,
                 unsigned long long inlen, const unsigned char *k);
 ```
 
-The `crypto_auth()` function computes a tag for the message `in`, whose length is `inlen` bytes, and the key `k`.
-`k` should be `crypto_auth_KEYBYTES` bytes.
-The function puts the tag into `out`. The tag is `crypto_auth_BYTES` bytes long.
+ `crypto_auth()` 函数用  key `k`，为 长度是 `inlen` 的消息 `in` 计算出 tag， `k` 必须是 `crypto_auth_KEYBYTES` 字节长.
+本函数把 tag 放入  `out`，tag 是 `crypto_auth_BYTES` 字节长.
 
 ```c
 int crypto_auth_verify(const unsigned char *h, const unsigned char *in,
                        unsigned long long inlen, const unsigned char *k);
 ```
 
-The `crypto_auth_verify()` function verifies that the tag stored at `h` is a valid tag for the message `in` whose length is `inlen` bytes, and the key `k`.
-
-It returns `-1` if the verification fails, and `0` if it passes.
-
-## Constants
+ `crypto_auth_verify()` 函数 用 key `k` 来验证 tag `h` 是 长度 `inlen` 的 消息 `in` 的合法 tag 。
+ 返回 `-1` 表示验证失败，`0`表示验证成功通过。
+ 
+ 
+## 常量
 
 - `crypto_auth_BYTES`
 - `crypto_auth_KEYBYTES`
 
-## Algorithm details
+## 算法细节 
 
 - HMAC-SHA512256
 
