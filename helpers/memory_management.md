@@ -39,21 +39,22 @@ int sodium_munlock(void * const addr, const size_t len);
 `sodium_unlock()` 也会取消这个额外保护。
 
 
-## 保护的堆内存分配 
+## 受防卫的堆内存分配 
 
-Sodium provides heap allocation functions for storing sensitive data.
+Sodium 提供了存储敏感数据用的 堆内存分配函数。
 
-These are not general-purpose allocation functions. In particular, they are slower than `malloc()` and friends, and they require 3 or 4 extra pages of virtual memory.
+这些不是通用的分配函数。尤其是，这些函数比 `malloc()` 等函数更慢，并且要求额外的 3 或 4 个 虚拟内存的 page 。 
 
-`sodium_init()` has to be called before using any of the guarded heap allocation functions.
+在调用这些受防卫的堆分配函数之前，必须调用 `sodium_init()` 。
 
 ```c
 void *sodium_malloc(size_t size);
 ```
 
-The `sodium_malloc()` function returns a pointer from which exactly `size` contiguous bytes of memory can be accessed.
+ `sodium_malloc()` 函数返回一个指针，指针后的  `size` 字节连续内存可以访问。
 
-The allocated region is placed at the end of a page boundary, immediately followed by a guard page. As a result, accessing memory past the end of the region will immediately terminate the application.
+分配的区间在一个 page 边界的尾部，紧随其后就是一个 防卫 page 。 这样，访问区间之后的内存会导致应用程序立即终结。
+
 
 A canary is also placed right before the returned pointer. Modification of this canary are detected when trying to free the allocated region with `sodium_free()`, and also cause the application to immediately terminate.
 
