@@ -39,7 +39,7 @@ int sodium_munlock(void * const addr, const size_t len);
 `sodium_unlock()` 也会取消这个额外保护。
 
 
-## 受防卫的堆内存分配 
+## 带防卫的堆内存分配 
 
 Sodium 提供了存储敏感数据用的 堆内存分配函数。
 
@@ -56,7 +56,7 @@ void *sodium_malloc(size_t size);
 分配的区间在一个 page 边界的尾部，紧随其后就是一个 防卫 page 。 这样，访问区间之后的内存会导致应用程序立即终结。
 
 
-A canary is also placed right before the returned pointer. Modification of this canary are detected when trying to free the allocated region with `sodium_free()`, and also cause the application to immediately terminate.
+ canary 是放在返回值指针之前的值。 如果 canary 被修改了，那么在 `sodium_free() ` 释放内存的时候就会发现，而且会导致程序立即终结。
 
 An additional guard page is placed before this canary to make it less likely for sensitive data to be accessible when reading past the end of an unrelated region.
 
