@@ -18,23 +18,28 @@ int sodium_mlock(void * const addr, const size_t len);
 
  `sodium_mlock()` 函数锁住 最少从 `addr` 开始的  `len` 字节。 这可以帮助防止 敏感数据被  swap 到磁盘进而泄露出去。
  
-In addition, it is recommended to totally disable swap partitions on machines processing senstive data, or, as a second choice, use encrypted swap partitions.
+另外，在处理敏感数据的机器华山，建议完全禁用 swap 分区，或者，作为第二选择，使用加密的 swap 分区。
 
-For similar reasons, on Unix systems, one should also disable core dumps when running crypto code outside a development environment. This can be achieved using a shell built-in such as `ulimit` or programatically using `setrlimit(RLIMIT_CORE, &(struct rlimit) {0, 0})`.
-On operating systems where this feature is implemented, kernel crash dumps should also be disabled.
+为了类似原因， 在 Unix 类系统上，在非开发环境运行密码学代码时，也应该禁用 core dump。
+这可以通过使用 shell 内置命令 `ulimit` 来实现，或者通过编程调用 `setrlimit(RLIMIT_CORE, &(struct rlimit) {0, 0})` 实现。
+在支持内核 crash dump 的操作系统上，内核 crash dump 也应该禁用掉。
 
-`sodium_mlock()` wraps `mlock()` and `VirtualLock()`. **Note:** Many systems place limits on the amount of memory that may be locked by a process. Care should be taken to raise those limits (e.g. Unix ulimits) where neccessary. `sodium_lock()` will return `-1` when any limit is reached.
+`sodium_mlock()` 封装 了`mlock()` 或 `VirtualLock()`. 
+**Note:** 很多系统限制了一个进程可以 锁定的内存的量。当调大这些限制的时候，应该小心。当必要的时候，`sodium_lock()` 会返回 `-1` 表示触发了限制。
 
 ```c
 int sodium_munlock(void * const addr, const size_t len);
 ```
 
-The `sodium_munlock()` function should be called after locked memory is not being used any more.
-It will zero `len` bytes starting at `addr` before actually flagging the pages as swappable again. Calling `sodium_memzero()` prior to `sodium_munlock()` is thus not required.
+被锁住的内存不再需要之后，应该调用 `sodium_munlock()` 函数。
+`sodium_munlock()` 函数会用0填充 从 `addr` 开始的 `len` 字节内存，然后把这些页标记成可以 swap。
+因此不需要在 `sodium_munlock()` 之前调用 `sodium_memzero()`。
 
-On systems where it is supported, `sodium_mlock()` also wraps `madvise()` and advises the kernel not to include the locked memory in core dumps. `sodium_unlock()` also undoes this additional protection.
+在支持的系统上，`sodium_mlock()` 也封装了 `madvise()` ，并且 建议 内核不要把 锁住的内存区间包括在 core dump 文件中。
+`sodium_unlock()` 也会取消这个额外保护。
 
-## Guarded heap allocations
+
+## 保护的堆内存分配 
 
 Sodium provides heap allocation functions for storing sensitive data.
 
